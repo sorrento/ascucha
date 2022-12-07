@@ -18,17 +18,18 @@ package com.example.android.mediasession.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.media.MediaBrowserServiceCompat;
 
 import com.example.android.mediasession.R;
 import com.example.android.mediasession.client.MediaBrowserHelper;
@@ -110,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Customize the connection to our {@link android.support.v4.media.MediaBrowserServiceCompat}
+     * Customize the connection to our {@link MediaBrowserServiceCompat}
      * and implement our app specific desires.
      */
     private class MediaBrowserConnection extends MediaBrowserHelper {

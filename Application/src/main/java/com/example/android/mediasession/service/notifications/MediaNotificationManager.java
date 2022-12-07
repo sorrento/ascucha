@@ -24,22 +24,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
-import android.support.v4.media.app.NotificationCompat.MediaStyle;
-import android.support.v4.media.session.MediaButtonReceiver;
+import androidx.media.app.NotificationCompat.MediaStyle;
+import androidx.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.support.v4.os.BuildCompat;
+import androidx.core.os.BuildCompat;
 import android.util.Log;
 
 import com.example.android.mediasession.R;
 import com.example.android.mediasession.service.MusicService;
-import com.example.android.mediasession.service.PlaybackInfoListener;
 import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
 import com.example.android.mediasession.ui.MainActivity;
 
@@ -208,7 +207,7 @@ public class MediaNotificationManager {
         Intent openUI = new Intent(mService, MainActivity.class);
         openUI.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         return PendingIntent.getActivity(
-                mService, REQUEST_CODE, openUI, PendingIntent.FLAG_CANCEL_CURRENT);
+                mService, REQUEST_CODE, openUI, PendingIntent.FLAG_IMMUTABLE);
     }
 
 }
