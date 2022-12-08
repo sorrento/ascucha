@@ -1,0 +1,12 @@
+
+Next test:
+- conectar con Parse y traerse un capítulo
+- conectar el objeto de parse con el metadata, para pasarlo directamente
+- que el texto ya vaya incluido
+- Primero trabajar con conexión traer cada vez de internet
+- traerse uno en concreto, luego gestionamos
+
+
+
+===============
+- podemos poner algún tipo de música de fondo

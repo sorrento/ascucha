@@ -24,6 +24,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation "androidx.media:media:1.6.0"
+    implementation 'com.parse:parse-android:1.16.3'
+//    implementation 'com.parse.bolts:bolts-android:1.4.0'
 }
 
 // The sample build uses multiple directories to
