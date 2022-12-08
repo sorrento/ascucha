@@ -15,7 +15,7 @@
   -->
 
 <resources>
-    <string name="app_name">MediaBrowserService Sample</string>
+    <string name="app_name" translatable="false">Ascucha</string>
     <string name="label_stop">Stop</string>
     <string name="label_pause">Pause</string>
     <string name="label_play">Play</string>

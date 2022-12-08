@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ascucha</string>
+    <string name="label_stop">Detiene</string>
+    <string name="label_pause">Pausa</string>
+    <string name="label_play">Reproduce</string>
+    <string name="label_play_pause">Reproduce / pausa</string>
+    <string name="label_previous">Pista anterior</string>
+    <string name="label_next">Próxima pista</string>
+</resources>
