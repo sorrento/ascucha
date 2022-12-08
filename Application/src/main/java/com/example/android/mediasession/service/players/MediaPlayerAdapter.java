@@ -28,6 +28,7 @@ import com.example.android.mediasession.service.PlaybackInfoListener;
 import com.example.android.mediasession.service.PlayerAdapter;
 import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
 import com.example.android.mediasession.ui.MainActivity;
+import android.speech.tts.TextToSpeech;
 
 /**
  * Exposes the functionality of the {@link MediaPlayer} and implements the {@link PlayerAdapter}
@@ -37,6 +38,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
     private final Context mContext;
     private MediaPlayer mMediaPlayer;
+    private TextToSpeech tts;
     private String mFilename;
     private PlaybackInfoListener mPlaybackInfoListener;
     private MediaMetadataCompat mCurrentMedia;
@@ -51,6 +53,22 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         super(context);
         mContext = context.getApplicationContext();
         mPlaybackInfoListener = listener;
+
+        TextToSpeech.OnInitListener onInitListener = new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status != TextToSpeech.ERROR) {
+                    String mCurrentLanguage = "ES";
+                    Log.d("MH", "prev set lan");
+                    Speak.setSpeakLanguage(tts, mCurrentLanguage);
+                    Log.d("MH", "after de set lan");
+//                tts.setOnUtteranceProgressListener(new uListener());
+//                readerEvents.voiceReady();
+                }
+            }
+        };
+
+        tts = new TextToSpeech(mContext, onInitListener); // para las pruebas en Android studio
     }
 
     /**
@@ -85,6 +103,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         mCurrentMedia = metadata;
         final String mediaId = metadata.getDescription().getMediaId();
         playFile(MusicLibrary.getMusicFilename(mediaId));
+        Speak.speak(metadata.getDescription().toString(), true, "uter", tts);
     }
 
     @Override
