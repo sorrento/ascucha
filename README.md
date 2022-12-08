@@ -1,6 +1,7 @@
 
 Android MediaBrowserService Sample
 ==================================
+**This fork is an update that allows to run in Android 33, using Androidx and other minor modifications**
 
 This sample has been deprecated/archived meaning it's read-only and it's no longer actively maintained (more details on archiving can be found [here][1]).
 
