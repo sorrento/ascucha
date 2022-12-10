@@ -22,6 +22,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.media.MediaBrowserCompat;
 import android.support.v4.media.MediaMetadataCompat;
+import android.util.Log;
 
 import com.example.android.mediasession.BuildConfig;
 import com.example.android.mediasession.R;
@@ -39,6 +40,7 @@ public class MusicLibrary {
     private static final TreeMap<String, MediaMetadataCompat> music = new TreeMap<>();
     private static final HashMap<String, Integer> albumRes = new HashMap<>();
     private static final HashMap<String, String> musicFileName = new HashMap<>();
+    private static String tag="MUSICLIB";
 
     static {
         createMediaMetadataCompat(
@@ -171,6 +173,7 @@ public class MusicLibrary {
 
     public static void createMediaMetadataCompat(Chapter chapter) {
         String mediaId= String.valueOf(chapter.getChapterId());
+        Log.d(tag, "Adding chapter:" + chapter.toString());
         music.put(
                 mediaId,
                 new MediaMetadataCompat.Builder()
@@ -191,5 +194,12 @@ public class MusicLibrary {
                         .build());
 //        albumRes.put(mediaId, albumArtResId);
 //        musicFileName.put(mediaId, musicFilename);
+    }
+
+    public static void addChapters(List<Chapter> lista) {
+        for (Chapter chapter : lista) {
+            createMediaMetadataCompat(chapter);
+
+        }
     }
 }

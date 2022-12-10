@@ -64,7 +64,7 @@ public class Chapter extends ParseObject {
 
         if (Constants.debugMode) texto = text.shortenText(getString("texto"), 150);
         else texto = getString("texto");
-        Log.d("tag2", texto);
+//        Log.d("tag2", texto);
 
         return texto;
     }

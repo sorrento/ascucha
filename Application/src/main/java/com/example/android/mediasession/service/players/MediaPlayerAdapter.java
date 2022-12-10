@@ -22,6 +22,8 @@ import android.media.MediaPlayer;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+
+import com.example.android.mediasession.Lector;
 import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.service.PlaybackInfoListener;
 import com.example.android.mediasession.service.PlayerAdapter;
@@ -117,7 +119,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
             playTexto(texto);
         }
         Preferences myPrefs = new Preferences(mContext);
-//        Lector lector = new Lector(mContext, myPrefs);
+        Lector lector = new Lector(mContext, myPrefs);
 //        lector.leeDesdePrincipio();
 
 //        Speak.speak(metadata.getDescription().toString(), true, "uter", tts);

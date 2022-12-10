@@ -3,6 +3,7 @@ package com.example.android.mediasession.book;
 import com.example.android.mediasession.GenericTaskInterface;
 import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.myLog;
+import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 
@@ -163,9 +164,10 @@ class ChapterService {
                         } else {
                             buffer = new LinkedList<>(lista);
                         }
+                        MusicLibrary.addChapters(lista);
                         lastIdInBuffer = size == BATCH_SIZE ? chapterId + BATCH_SIZE - 1 : maxChapters;
-                        myLog.add("ahora la lista tiene" + buffer.size() +
-                                " y el id del ultimodel buff es " + lastIdInBuffer, tag);
+//                        myLog.add("ahora la lista tiene" + buffer.size() +
+//                                " y el id del ultimodel buff es " + lastIdInBuffer, tag);
                         genericTaskInterface.onDone();
                     } else {
                         mCsEvents.error("Traté de capitulos de parse y no pude. ¿Era local? " + isLocalStorage, null);
