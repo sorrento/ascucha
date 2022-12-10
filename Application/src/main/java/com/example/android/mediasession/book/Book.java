@@ -5,6 +5,7 @@ import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.ReaderEvents;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import android.util.Log;
 
 
 public class Book {
@@ -48,7 +49,8 @@ public class Book {
 
             @Override
             public void onError(String text, ParseException e) {
-
+                Log.d("MH", text );
+                Log.d("MH", e.getMessage() );
             }
         };
 

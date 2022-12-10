@@ -154,7 +154,7 @@ public class ParseHelper {
         });
     }
 
-    static void getBookSummary(final int iBook, final boolean local, final BookSumCallback bookSumCallback) {
+    public static void getBookSummary(final int iBook, final boolean local, final BookSumCallback bookSumCallback) {
 
         ParseQuery<BookSummary> q = ParseQuery.getQuery(BookSummary.class);
         q.whereEqualTo("libroId", iBook);
@@ -170,7 +170,8 @@ public class ParseHelper {
                     if (local) {
                         bookSumCallback.onError("No se pudo cargar el summary desde local", e);
                         //getBookSummary(iBook, false, bookSumCallback); //todo momentaneo, porque parece que no lo guarmamos en local
-//                    bookSumCallback.onError("Getting summary book:" + iBook + " local: " + local, e);
+                    }else{
+                        bookSumCallback.onError("Getting summary book:" + iBook + " local: " + local, e);
                     }
                 }
             }

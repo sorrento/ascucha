@@ -22,8 +22,7 @@ import android.media.MediaPlayer;
 import android.os.SystemClock;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
-import android.util.Log;
-
+import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.service.PlaybackInfoListener;
 import com.example.android.mediasession.service.PlayerAdapter;
 import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
@@ -48,6 +47,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     // Work-around for a MediaPlayer bug related to the behavior of MediaPlayer.seekTo()
     // while not playing.
     private int mSeekWhileNotPlaying = -1;
+    private String mType;
 
     public MediaPlayerAdapter(Context context, PlaybackInfoListener listener) {
         super(context);
@@ -59,9 +59,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
             public void onInit(int status) {
                 if (status != TextToSpeech.ERROR) {
                     String mCurrentLanguage = "ES";
-                    Log.d("MH", "prev set lan");
                     Speak.setSpeakLanguage(tts, mCurrentLanguage);
-                    Log.d("MH", "after de set lan");
 //                tts.setOnUtteranceProgressListener(new uListener());
 //                readerEvents.voiceReady();
                 }
@@ -102,8 +100,27 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     public void playFromMedia(MediaMetadataCompat metadata) {
         mCurrentMedia = metadata;
         final String mediaId = metadata.getDescription().getMediaId();
-        playFile(MusicLibrary.getMusicFilename(mediaId));
-        Speak.speak(metadata.getDescription().toString(), true, "uter", tts);
+
+        String texto = metadata.getString(MediaMetadataCompat.METADATA_KEY_COMPILATION);
+        if (texto.equals("")) {
+            mType = "audio";
+        } else {
+            mType = "texto";
+        }
+//        mType = metadata.getString("type");
+
+
+        if (mType.equals("audio")) {
+            playFile(MusicLibrary.getMusicFilename(mediaId));
+        } else if (mType.equals("texto")) {
+            //es es ahí donde escondemos el texto
+            playTexto(texto);
+        }
+        Preferences myPrefs = new Preferences(mContext);
+//        Lector lector = new Lector(mContext, myPrefs);
+//        lector.leeDesdePrincipio();
+
+//        Speak.speak(metadata.getDescription().toString(), true, "uter", tts);
     }
 
     @Override
@@ -151,6 +168,46 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         play();
     }
 
+    private void playTexto(String texto) {
+        boolean mediaChanged = (mFilename == null || !texto.equals(mFilename));
+        Speak.speak(texto, true, "uter", tts);
+//        if (mCurrentMediaPlayedToCompletion) {
+//            // Last audio file was played to completion, the resourceId hasn't changed, but the
+//            // player was released, so force a reload of the media file for playback.
+//            mediaChanged = true;
+//            mCurrentMediaPlayedToCompletion = false;
+//        }
+//        if (!mediaChanged) {
+//            if (!isPlaying()) {
+//                play();
+//            }
+//            return;
+//        } else {
+//            release();
+//        }
+
+        mFilename = texto;
+        initializeMediaPlayer();
+
+//        try {
+//            AssetFileDescriptor assetFileDescriptor = mContext.getAssets().openFd(mFilename);
+//            mMediaPlayer.setDataSource(
+//                    assetFileDescriptor.getFileDescriptor(),
+//                    assetFileDescriptor.getStartOffset(),
+//                    assetFileDescriptor.getLength());
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to open file: " + mFilename, e);
+//        }
+//
+//        try {
+//            mMediaPlayer.prepare();
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to open file: " + mFilename, e);
+//        }
+
+        play();
+    }
+
     @Override
     public void onStop() {
         // Regardless of whether or not the MediaPlayer has been created / started, the state must
@@ -174,7 +231,13 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     @Override
     protected void onPlay() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            mMediaPlayer.start();
+            if (mType.equals("audio")) {
+                mMediaPlayer.start();
+            } else if (mType.equals("texto")) {
+//                tts.speak(" aquí debería leer el textod que me pasan", TextToSpeech.QUEUE_FLUSH,
+//                        null, "utter");
+            }
+
             setNewState(PlaybackStateCompat.STATE_PLAYING);
         }
     }
@@ -212,9 +275,9 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         final PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder();
         stateBuilder.setActions(getAvailableActions());
         stateBuilder.setState(mState,
-                              reportPosition,
-                              1.0f,
-                              SystemClock.elapsedRealtime());
+                reportPosition,
+                1.0f,
+                SystemClock.elapsedRealtime());
         mPlaybackInfoListener.onPlaybackStateChange(stateBuilder.build());
     }
 
@@ -227,28 +290,28 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     @PlaybackStateCompat.Actions
     private long getAvailableActions() {
         long actions = PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
-                       | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
-                       | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-                       | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
+                | PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                | PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                | PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS;
         switch (mState) {
             case PlaybackStateCompat.STATE_STOPPED:
                 actions |= PlaybackStateCompat.ACTION_PLAY
-                           | PlaybackStateCompat.ACTION_PAUSE;
+                        | PlaybackStateCompat.ACTION_PAUSE;
                 break;
             case PlaybackStateCompat.STATE_PLAYING:
                 actions |= PlaybackStateCompat.ACTION_STOP
-                           | PlaybackStateCompat.ACTION_PAUSE
-                           | PlaybackStateCompat.ACTION_SEEK_TO;
+                        | PlaybackStateCompat.ACTION_PAUSE
+                        | PlaybackStateCompat.ACTION_SEEK_TO;
                 break;
             case PlaybackStateCompat.STATE_PAUSED:
                 actions |= PlaybackStateCompat.ACTION_PLAY
-                           | PlaybackStateCompat.ACTION_STOP;
+                        | PlaybackStateCompat.ACTION_STOP;
                 break;
             default:
                 actions |= PlaybackStateCompat.ACTION_PLAY
-                           | PlaybackStateCompat.ACTION_PLAY_PAUSE
-                           | PlaybackStateCompat.ACTION_STOP
-                           | PlaybackStateCompat.ACTION_PAUSE;
+                        | PlaybackStateCompat.ACTION_PLAY_PAUSE
+                        | PlaybackStateCompat.ACTION_STOP
+                        | PlaybackStateCompat.ACTION_PAUSE;
         }
         return actions;
     }

@@ -41,6 +41,7 @@ class ChapterService {
     Chapter giveMeSame() {
         if (!buffer.isEmpty()) {
             Chapter chapter = buffer.peek();
+            chapter.setMaxChap(chapterId);
             if (chapter.getChapterId() != chapterId)
                 mCsEvents.error("No coincide el chapter aidí. " +
                         "el del chapter: " + chapter.getChapterId() +

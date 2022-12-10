@@ -25,6 +25,7 @@ import android.support.v4.media.MediaMetadataCompat;
 
 import com.example.android.mediasession.BuildConfig;
 import com.example.android.mediasession.R;
+import com.example.android.mediasession.book.Chapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,27 +42,41 @@ public class MusicLibrary {
 
     static {
         createMediaMetadataCompat(
-                "Jazz_In_Paris",
-                "Jazz in Paris",
-                "Media Right Productions",
+                "cap1",
+                "capi 1",
+                "Milenko el deo",
                 "Jazz & Blues",
                 "Jazz",
                 103,
                 TimeUnit.SECONDS,
                 "jazz_in_paris.mp3",
                 R.drawable.album_jazz_blues,
-                "album_jazz_blues");
+                "album_jazz_blues",
+                "Esto es el capítulo 1 para leer");
         createMediaMetadataCompat(
-                "The_Coldest_Shoulder",
-                "The Coldest Shoulder",
-                "The 126ers",
+                "cap2",
+                "capitulo 2 titulo",
+                "mili2",
                 "Youtube Audio Library Rock 2",
                 "Rock",
                 160,
                 TimeUnit.SECONDS,
                 "the_coldest_shoulder.mp3",
                 R.drawable.album_youtube_audio_library_rock_2,
-                "album_youtube_audio_library_rock_2");
+                "album_youtube_audio_library_rock_2",
+                "Esto es el texto del capítulo 2");
+
+//        createMediaMetadataCompat(
+//                "The_Coldest_Shoulder",
+//                "The Coldest Shoulder",
+//                "The 126ers",
+//                "Youtube Audio Library Rock 2",
+//                "Rock",
+//                160,
+//                TimeUnit.SECONDS,
+//                "the_coldest_shoulder.mp3",
+//                R.drawable.album_youtube_audio_library_rock_2,
+//                "album_youtube_audio_library_rock_2","");
     }
 
     public static String getRoot() {
@@ -74,7 +89,7 @@ public class MusicLibrary {
     }
 
     public static String getMusicFilename(String mediaId) {
-        return musicFileName.containsKey(mediaId) ? musicFileName.get(mediaId) : null;
+        return musicFileName.getOrDefault(mediaId, null);
     }
 
     private static int getAlbumRes(String mediaId) {
@@ -109,7 +124,8 @@ public class MusicLibrary {
                         MediaMetadataCompat.METADATA_KEY_ALBUM,
                         MediaMetadataCompat.METADATA_KEY_ARTIST,
                         MediaMetadataCompat.METADATA_KEY_GENRE,
-                        MediaMetadataCompat.METADATA_KEY_TITLE
+                        MediaMetadataCompat.METADATA_KEY_TITLE,
+                        MediaMetadataCompat.METADATA_KEY_COMPILATION
                 }) {
             builder.putString(key, metadataWithoutBitmap.getString(key));
         }
@@ -130,7 +146,7 @@ public class MusicLibrary {
             TimeUnit durationUnit,
             String musicFilename,
             int albumArtResId,
-            String albumArtResName) {
+            String albumArtResName, String texto) {
         music.put(
                 mediaId,
                 new MediaMetadataCompat.Builder()
@@ -147,8 +163,33 @@ public class MusicLibrary {
                                 MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
                                 getAlbumArtUri(albumArtResName))
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+                        .putString(MediaMetadataCompat.METADATA_KEY_COMPILATION, texto)
                         .build());
         albumRes.put(mediaId, albumArtResId);
         musicFileName.put(mediaId, musicFilename);
+    }
+
+    public static void createMediaMetadataCompat(Chapter chapter) {
+        String mediaId= String.valueOf(chapter.getChapterId());
+        music.put(
+                mediaId,
+                new MediaMetadataCompat.Builder()
+                        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, mediaId)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, chapter.getBookName())
+                        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, chapter.getAuthor())
+                        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,chapter.getDuration())
+                        .putString(MediaMetadataCompat.METADATA_KEY_COMPILATION,chapter.getText())
+//                        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, chapter.getGenere())
+                        // todo work with images
+//                        .putString(
+//                                MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI,
+//                                getAlbumArtUri(albumArtResName))
+//                        .putString(
+//                                MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON_URI,
+//                                getAlbumArtUri(albumArtResName))
+                        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, chapter.getTitle())
+                        .build());
+//        albumRes.put(mediaId, albumArtResId);
+//        musicFileName.put(mediaId, musicFilename);
     }
 }

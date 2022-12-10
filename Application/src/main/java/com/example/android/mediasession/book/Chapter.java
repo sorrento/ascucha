@@ -4,6 +4,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import com.example.android.mediasession.Constants;
+import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
 import com.example.android.mediasession.text;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
@@ -14,6 +15,8 @@ import com.parse.ParseObject;
 
 @ParseClassName("libros")
 public class Chapter extends ParseObject {
+
+    private int mMaxChap;
 
     public Chapter() {
     }
@@ -101,5 +104,34 @@ public class Chapter extends ParseObject {
 
         s1 = s.length() > endIndex ? s.substring(0, endIndex) : s;
         return s1;
+    }
+
+    public void createMetadata() {
+        MusicLibrary.createMediaMetadataCompat(this);
+    }
+
+    public long getDuration() {
+        long n = countWordsUsingSplit(this.getText());
+        return n;
+    }
+
+    private static int countWordsUsingSplit(String input) {
+        if (input == null || input.isEmpty()) {
+            return 0;
+        }
+        String[] words = input.split("\\s+");
+        return words.length;
+    }
+
+    public String getTitle() {
+        int len = 25;
+        String s = this.getText();
+        String max = String.valueOf(mMaxChap);
+
+        return this.getChapterId() + "/" + max + " | " + s.substring(0, len) + "...";
+    }
+
+    public void setMaxChap(int chapterId) {
+        mMaxChap = chapterId;
     }
 }

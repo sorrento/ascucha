@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 
 import com.example.android.mediasession.book.Book;
 import com.example.android.mediasession.book.BookSummary;
-import com.example.android.mediasession.ui.MainActivity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -31,8 +30,8 @@ public class Preferences {
     private SharedPreferences settings;
     private String TAG = "PREF";
 
-    public Preferences(MainActivity mainActivity) {
-        settings = mainActivity.getPreferences(Context.MODE_PRIVATE);
+    public Preferences(Context mainActivity) {
+        settings = mainActivity.getSharedPreferences("potato", Context.MODE_PRIVATE);
         //isLocalStorage = settings.getBoolean(PREFS_IS_LOCAL_STORAGE, false);
 
         myLog.add("RECUPERANDO: from beginnig: " + settings.getBoolean(PREFS_STARTED_FROM_BEGINNING, false) +
