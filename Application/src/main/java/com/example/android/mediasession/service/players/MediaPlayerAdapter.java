@@ -17,19 +17,16 @@
 package com.example.android.mediasession.service.players;
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.util.Log;
 
-import com.example.android.mediasession.Lector;
-import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.service.PlaybackInfoListener;
 import com.example.android.mediasession.service.PlayerAdapter;
-import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
 import com.example.android.mediasession.ui.MainActivity;
-import android.speech.tts.TextToSpeech;
 
 /**
  * Exposes the functionality of the {@link MediaPlayer} and implements the {@link PlayerAdapter}
@@ -38,7 +35,7 @@ import android.speech.tts.TextToSpeech;
 public final class MediaPlayerAdapter extends PlayerAdapter {
 
     private final Context mContext;
-    private MediaPlayer mMediaPlayer;
+    private MediaPlayer2 mMediaPlayer;
     private TextToSpeech tts;
     private String mFilename;
     private PlaybackInfoListener mPlaybackInfoListener;
@@ -50,25 +47,14 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     // while not playing.
     private int mSeekWhileNotPlaying = -1;
     private String mType;
+    private String tag="MEDPLAYADAP";
 
     public MediaPlayerAdapter(Context context, PlaybackInfoListener listener) {
         super(context);
         mContext = context.getApplicationContext();
         mPlaybackInfoListener = listener;
+        initializeMediaPlayer();
 
-        TextToSpeech.OnInitListener onInitListener = new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status != TextToSpeech.ERROR) {
-                    String mCurrentLanguage = "ES";
-                    Speak.setSpeakLanguage(tts, mCurrentLanguage);
-//                tts.setOnUtteranceProgressListener(new uListener());
-//                readerEvents.voiceReady();
-                }
-            }
-        };
-
-        tts = new TextToSpeech(mContext, onInitListener); // para las pruebas en Android studio
     }
 
     /**
@@ -80,10 +66,11 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
      */
     private void initializeMediaPlayer() {
         if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
+            mMediaPlayer = new MediaPlayer2(mContext);
             mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
+                    Log.d(tag, "on mediaPlayer inicializado");
                     mPlaybackInfoListener.onPlaybackCompleted();
 
                     // Set the state to "paused" because it most closely matches the state
@@ -101,28 +88,14 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     @Override
     public void playFromMedia(MediaMetadataCompat metadata) {
         mCurrentMedia = metadata;
-        final String mediaId = metadata.getDescription().getMediaId();
+//        final String mediaId = metadata.getDescription().getMediaId();
 
         String texto = metadata.getString(MediaMetadataCompat.METADATA_KEY_COMPILATION);
-        if (texto.equals("")) {
-            mType = "audio";
-        } else {
-            mType = "texto";
-        }
-//        mType = metadata.getString("type");
-
-
-        if (mType.equals("audio")) {
-            playFile(MusicLibrary.getMusicFilename(mediaId));
-        } else if (mType.equals("texto")) {
-            //es es ahí donde escondemos el texto
-            playTexto(texto);
-        }
-        Preferences myPrefs = new Preferences(mContext);
-        Lector lector = new Lector(mContext, myPrefs);
+        playFile(texto); //lo hemos transformado para que lea
+//        Preferences myPrefs = new Preferences(mContext);
+//        Lector lector = new Lector(mContext, myPrefs);
 //        lector.leeDesdePrincipio();
 
-//        Speak.speak(metadata.getDescription().toString(), true, "uter", tts);
     }
 
     @Override
@@ -130,49 +103,8 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
         return mCurrentMedia;
     }
 
-    private void playFile(String filename) {
-        boolean mediaChanged = (mFilename == null || !filename.equals(mFilename));
-        if (mCurrentMediaPlayedToCompletion) {
-            // Last audio file was played to completion, the resourceId hasn't changed, but the
-            // player was released, so force a reload of the media file for playback.
-            mediaChanged = true;
-            mCurrentMediaPlayedToCompletion = false;
-        }
-        if (!mediaChanged) {
-            if (!isPlaying()) {
-                play();
-            }
-            return;
-        } else {
-            release();
-        }
-
-        mFilename = filename;
-
-        initializeMediaPlayer();
-
-        try {
-            AssetFileDescriptor assetFileDescriptor = mContext.getAssets().openFd(mFilename);
-            mMediaPlayer.setDataSource(
-                    assetFileDescriptor.getFileDescriptor(),
-                    assetFileDescriptor.getStartOffset(),
-                    assetFileDescriptor.getLength());
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to open file: " + mFilename, e);
-        }
-
-        try {
-            mMediaPlayer.prepare();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to open file: " + mFilename, e);
-        }
-
-        play();
-    }
-
-    private void playTexto(String texto) {
+    private void playFile(String texto) {
         boolean mediaChanged = (mFilename == null || !texto.equals(mFilename));
-        Speak.speak(texto, true, "uter", tts);
 //        if (mCurrentMediaPlayedToCompletion) {
 //            // Last audio file was played to completion, the resourceId hasn't changed, but the
 //            // player was released, so force a reload of the media file for playback.
@@ -189,18 +121,20 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 //        }
 
         mFilename = texto;
-        initializeMediaPlayer();
 
-//        try {
+//        initializeMediaPlayer();
+
+        try {
 //            AssetFileDescriptor assetFileDescriptor = mContext.getAssets().openFd(mFilename);
 //            mMediaPlayer.setDataSource(
 //                    assetFileDescriptor.getFileDescriptor(),
 //                    assetFileDescriptor.getStartOffset(),
 //                    assetFileDescriptor.getLength());
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to open file: " + mFilename, e);
-//        }
-//
+            mMediaPlayer.setDataSource(texto);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to open file: " + mFilename, e);
+        }
+
 //        try {
 //            mMediaPlayer.prepare();
 //        } catch (Exception e) {
@@ -209,6 +143,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
         play();
     }
+
 
     @Override
     public void onStop() {
@@ -233,13 +168,7 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
     @Override
     protected void onPlay() {
         if (mMediaPlayer != null && !mMediaPlayer.isPlaying()) {
-            if (mType.equals("audio")) {
-                mMediaPlayer.start();
-            } else if (mType.equals("texto")) {
-//                tts.speak(" aquí debería leer el textod que me pasan", TextToSpeech.QUEUE_FLUSH,
-//                        null, "utter");
-            }
-
+            mMediaPlayer.start();
             setNewState(PlaybackStateCompat.STATE_PLAYING);
         }
     }

@@ -12,7 +12,7 @@ import com.example.android.mediasession.service.players.Speak;
 
 public class Voice implements VoiceInterface {
 
-    private static final String             UTTSAVEPREFIX     = "SAVE";
+    public static final String             UTTSAVEPREFIX     = "SAVE";
     private final        String             mCurrentLanguage;
     private final        Context            mContext;
     private final        ReaderEvents       readerEvents;

@@ -40,7 +40,7 @@ public class MusicLibrary {
     private static final TreeMap<String, MediaMetadataCompat> music = new TreeMap<>();
     private static final HashMap<String, Integer> albumRes = new HashMap<>();
     private static final HashMap<String, String> musicFileName = new HashMap<>();
-    private static String tag="MUSICLIB";
+    private static final String tag="MUSICLIB";
 
     static {
         createMediaMetadataCompat(
@@ -199,7 +199,6 @@ public class MusicLibrary {
     public static void addChapters(List<Chapter> lista) {
         for (Chapter chapter : lista) {
             createMediaMetadataCompat(chapter);
-
         }
     }
 }
