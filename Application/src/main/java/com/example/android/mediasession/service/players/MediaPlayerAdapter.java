@@ -92,10 +92,6 @@ public final class MediaPlayerAdapter extends PlayerAdapter {
 
         String texto = metadata.getString(MediaMetadataCompat.METADATA_KEY_COMPILATION);
         playFile(texto); //lo hemos transformado para que lea
-//        Preferences myPrefs = new Preferences(mContext);
-//        Lector lector = new Lector(mContext, myPrefs);
-//        lector.leeDesdePrincipio();
-
     }
 
     @Override

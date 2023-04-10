@@ -20,10 +20,14 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+
 import android.support.v4.media.MediaBrowserCompat;
+
 import androidx.media.MediaBrowserServiceCompat;
+
 import android.support.v4.media.MediaDescriptionCompat;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -57,8 +61,8 @@ public class MusicService extends MediaBrowserServiceCompat {
         mSession.setCallback(mCallback);
         mSession.setFlags(
                 MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS |
-                MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+                        MediaSessionCompat.FLAG_HANDLES_QUEUE_COMMANDS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
         setSessionToken(mSession.getSessionToken());
 
         mMediaNotificationManager = new MediaNotificationManager(this);
@@ -85,6 +89,7 @@ public class MusicService extends MediaBrowserServiceCompat {
     public BrowserRoot onGetRoot(@NonNull String clientPackageName,
                                  int clientUid,
                                  Bundle rootHints) {
+        Log.d(TAG, "OnGetRoot: clientPackageName=" + clientPackageName);
         return new BrowserRoot(MusicLibrary.getRoot(), null);
     }
 
@@ -106,6 +111,7 @@ public class MusicService extends MediaBrowserServiceCompat {
             mPlaylist.add(new MediaSessionCompat.QueueItem(description, description.hashCode()));
             mQueueIndex = (mQueueIndex == -1) ? 0 : mQueueIndex;
             mSession.setQueue(mPlaylist);
+            Log.d(TAG, "onAddQueueItem: " + description+"now queue size is "+mPlaylist.size());
         }
 
         @Override
@@ -118,15 +124,19 @@ public class MusicService extends MediaBrowserServiceCompat {
         @Override
         public void onPrepare() {
             if (mQueueIndex < 0 && mPlaylist.isEmpty()) {
-                // Nothing to play.
+                Log.d(TAG, "Nothing to play.");
                 return;
             }
 
             final String mediaId = mPlaylist.get(mQueueIndex).getDescription().getMediaId();
+            Log.d(TAG, "onPrepare: mediaId is "+mediaId+" and queue index is "+mQueueIndex +
+                    " and playlist size is "+mPlaylist.size());
             mPreparedMedia = MusicLibrary.getMetadata(MusicService.this, mediaId);
             mSession.setMetadata(mPreparedMedia);
+            Log.d(TAG, "onPrepare: mPreparedMedia is "+mPreparedMedia);
 
             if (!mSession.isActive()) {
+                Log.d(TAG, "onPrepare: MediaSession active");
                 mSession.setActive(true);
             }
         }
@@ -139,9 +149,11 @@ public class MusicService extends MediaBrowserServiceCompat {
             }
 
             if (mPreparedMedia == null) {
+                Log.d(TAG, "onPlay: preparing media because it is null");
                 onPrepare();
             }
 
+            Log.d(TAG, "onPlay:after onprepare. mPreparedMedia is "+mPreparedMedia.size());
             mPlayback.playFromMedia(mPreparedMedia);
             Log.d(TAG, "onPlayFromMediaId: MediaSession active");
         }

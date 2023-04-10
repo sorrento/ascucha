@@ -25,13 +25,18 @@ import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.media.MediaBrowserServiceCompat;
 
+import com.example.android.mediasession.Preferences;
 import com.example.android.mediasession.R;
+import com.example.android.mediasession.book.CSEvents;
+import com.example.android.mediasession.book.ChapterService;
 import com.example.android.mediasession.client.MediaBrowserHelper;
 import com.example.android.mediasession.service.MusicService;
 import com.example.android.mediasession.service.contentcatalogs.MusicLibrary;
@@ -49,11 +54,33 @@ public class MainActivity extends AppCompatActivity {
     private MediaBrowserHelper mMediaBrowserHelper;
 
     private boolean mIsPlaying;
+    private boolean mServiceReady=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+//        prepare the chapter service
+        Preferences myPrefs= new Preferences(this);
+        ChapterService mChapterService = new ChapterService(1, 1, 10, false,
+                myPrefs, new CSEvents() {
+            @Override
+            public void serviceReady() {
+                Log.d("ChapterService", "serviceReady");
+                mServiceReady=true;
+            }
+
+            @Override
+            public void bookEnded() {
+                Log.d("ChapterService", "bookEnded");
+            }
+
+            @Override
+            public void error(String text, Exception e) {
+                Log.e("ChapterService", text, e);
+            }
+        });
 
         mTitleTextView = findViewById(R.id.song_title);
         mArtistTextView = findViewById(R.id.song_artist);
@@ -73,7 +100,23 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        mMediaBrowserHelper.onStart();
+        Log.d("ChapterService", "onStart, trying to start service...");
+        // if the chapter service is not ready, wait for it 1 second and retry. do not sleep the main thread
+        if (!mServiceReady) {
+            Log.d("ChapterService", "service not ready, waiting>>>>>>>>>>>>>>>>>>>>>>>>>");
+            new android.os.Handler().postDelayed(
+                    new Runnable() {
+                        public void run() {
+                            onStart();
+                        }
+                    },
+                    3000);
+        }else {
+            Log.d("ChapterService", "service ready, starting>>>>>>>>>>>>>>>>>>>>>>>>>");
+
+            mMediaBrowserHelper.onStart();
+        }
+
     }
 
     @Override

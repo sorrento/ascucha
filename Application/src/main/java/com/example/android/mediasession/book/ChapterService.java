@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
-class ChapterService {
+public class ChapterService {
     private static final int      BATCH_SIZE = 10;
     private final        CSEvents mCsEvents;
     private              int      bookId, chapterId, maxChapters, lastIdInBuffer;
@@ -21,8 +21,8 @@ class ChapterService {
     private Queue<Chapter> buffer;
     private String         tag = "CHSER";
 
-    ChapterService(int bookId, int chapterId, int maxChapters, boolean isLocalStorage,
-                   Preferences preferences, final CSEvents csEvents) {
+    public ChapterService(int bookId, int chapterId, int maxChapters, boolean isLocalStorage,
+                          Preferences preferences, final CSEvents csEvents) {
         this.bookId = bookId;
         this.chapterId = chapterId;
         this.maxChapters = maxChapters;

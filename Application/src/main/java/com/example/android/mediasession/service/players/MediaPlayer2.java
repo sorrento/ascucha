@@ -32,7 +32,6 @@ public class MediaPlayer2 extends MediaPlayer {
                     mTts.setOnUtteranceProgressListener(new uListener());
                     Log.d(tag, "inicializado el tts");
 //                readerEvents.voiceReady();
-//                super.
                 }else{
                     Log.d(tag, "status de error al inicializar tts");
                 }
@@ -41,7 +40,6 @@ public class MediaPlayer2 extends MediaPlayer {
 
         mTts = new TextToSpeech(context, onInitListener);
         Log.d(tag, "en constructor fin");
-//        super.
     }
 
     @Override
@@ -76,15 +74,15 @@ public class MediaPlayer2 extends MediaPlayer {
     @Override
     public void prepare() throws IOException, IllegalStateException {
         Log.d(tag, "on prepare()");
-//        super.prepare();
+    super.prepare();
     }
 
     @Override
-    public void setDataSource(String path) throws IOException, IllegalArgumentException, IllegalStateException, SecurityException {
-//        super.setDataSource(path);
+    public void setDataSource(String texto) throws IOException, IllegalArgumentException, IllegalStateException, SecurityException {
+//        super.setDataSource(texto);
 //        usamos este como canal para pasar el texto
-        mText = path;
-        Log.d(tag, " seteando el texto:" + path);
+        mText = texto;
+        Log.d(tag, " seteando el texto:" + texto);
     }
 
 
