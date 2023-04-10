@@ -3,12 +3,72 @@ Next test:
 
 v 0.1
 x- conectar con Parse y traerse un capítulo
+    Hay un problema de concurrencia: cuando lo ejecuto en tiempo real, muestra sólo los dos capitulos fijos
+    Cuando debugo, sí que muestra los 10 capítulos de parse:
+        (- cuando debugo, el onAddQueueItem se ejecuta antes de que se llame a onPrepare)
+        Pongamos logs para ver que pasa
+       !!! el onprepare se ejectuta antes de que se llame a onAddQueueItem de los del parse
+       ¿qué dispara el onAddQueueItem?
+
 - conectar el objeto de parse con el metadata, para pasarlo directamente
 - que el texto ya vaya incluido
 - Primero trabajar con conexión traer cada vez de internet
-- traerse uno en concreto, luego gestionamos
-
-
-
+- traerse uno en concreto, luego gestionamos la lista
 ===============
+v 0.01
+- que cada canción sea un capítulo del libro, que se avance y se retroceda
+- que al final de una cápsula salte a la siguiente
+- cada petición a Parse se hace en tiempo real cuando se necesita
+
+play() se activa al abrir la app
+
+Play()
+    play pide un un capitulo del libro current en la posición actual
+    al terminar de leer aprieta Next()
+
+Next() suma uno al contador de cápsulas y aprieta play
+
+Prev() resta uno al contador y aprieta play
+
+--- Nuevo Flujo
+1. al iniciar, hacemos reloadChapter (chapterService)
+[ahora mismo no lee de la lista]
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    Problema: con mis ítems no se pasa por el onAddQueueItem, lo que hace que
+    mPlaylist en MusicService no tenga más que les mediaId de ejemplo, aunque
+    la musicLibrary sí que tiene mis textos. Parece ser un problema de sincronia
+    que el onprepare lo hace antes o despues de que haga add con mis chapters
+    ** cuando hago debug toma los míos, pero cuando hago run no, toma los de ejemplo
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+================ Flujo
+MePlAd/onPlay()
+    mediaplayer2/start() -> usa el tts
+
+MePlAd/PlayFromMedia(meta)
+    MePlAd/PlayFile(txt)
+        PlAd/Play()
+           setDataSource() ->proporcionamos el texto
+
+MusicService/onPlay
+
+
+En mediaplayer2/start() usa el tts, es llamado por MePlAd/onPlay(). Lee el texto que he
+hemos pasado en setDataSource(). Esto es llamado por PlAd/play()  y este llamado por
+MePlAd/PlayFile(txt) y este desde MePlAd/PlayFromMedia(meta)
+
+Esto es llamado desde MusicService/onPlay dado un mPreparedMedia (es un meta)
+Este obtiene el metadata de MusicLibrary.getmetadata(mediaId) en MusicService/OnPrepare()
+
+onPlay() > playFromMedia > playFile > play > onPlay > start()
+
+--- Donde intervenimos
+    createMediaMetadataCompat(Chapter chapter) ponemos en el hash music los datos de un chapter.
+    El texto del chap lo ponemos en KEY_COMPILATION
+
+    addChapters(List<Chapter> lista)
+
+    en reloadBuffer() damos la lista a MusicLibrary.addChapters(lista) [lista de chapters]
+
+=============== POSIBLES IDEAS
 - podemos poner algún tipo de música de fondo
